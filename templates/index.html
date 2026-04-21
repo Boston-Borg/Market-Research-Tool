@@ -4,44 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Market Research Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Times New Roman", Times, serif;
-            color: #000000;
+        :root {
+            --sage: #b2c9ad;
+            --sage-dark: #8faa89;
+            --sage-light: #ccddc8;
+            --forest: #2d5a27;
+            --forest-mid: #3a7035;
+            --forest-light: #4d8a47;
+            --bark: #5c4a32;
+            --mist: #f0f4ef;
+            --white: #ffffff;
+            --ink: #1a2419;
+            --ink-soft: #3d4d3b;
+            --moss: #6b8f66;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: #b2c9ad;
+            background-color: var(--sage);
             min-height: 100vh;
-            padding: 40px 20px;
+            font-family: 'Lora', Georgia, serif;
+            color: var(--ink);
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 860px;
-            margin: 0 auto;
+        .mountain-bg {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.18;
         }
 
-        /* Bear */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 80px;
+        }
+
         #bear-widget {
             position: fixed;
             top: 20px;
-            right: 24px;
+            right: 28px;
             font-size: 44px;
             z-index: 9999;
             cursor: default;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
         }
 
         @keyframes wobble {
             0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-8deg); }
-            75% { transform: rotate(8deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
         }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -49,124 +77,258 @@
         }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
-        .bear-wobble { animation: wobble 0.4s ease-in-out infinite; }
-        .bear-bounce { animation: bounce 0.5s ease-in-out infinite; }
-        .bear-spin   { animation: spin 0.8s linear infinite; }
-        .bear-shake  { animation: shake 0.3s ease-in-out infinite; }
+        .bear-wobble { animation: wobble 0.45s ease-in-out infinite; }
+        .bear-bounce { animation: bounce 0.55s ease-in-out infinite; }
+        .bear-spin   { animation: spin 0.9s linear infinite; }
+        .bear-shake  { animation: shake 0.35s ease-in-out infinite; }
 
-        /* Header */
-        .header {
-            margin-bottom: 32px;
+        .hero {
+            text-align: center;
+            padding: 64px 24px 40px;
         }
 
-        .header h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
-            color: #2d5a27;
+        .hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.4rem, 5vw, 3.8rem);
+            font-weight: 900;
+            color: var(--forest);
+            line-height: 1.1;
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 14px;
         }
 
-        .header p {
+        .hero h1 span { color: var(--forest-mid); font-style: italic; }
+
+        .hero-sub {
+            font-family: 'Lora', serif;
             font-size: 0.95rem;
-            color: #000000;
-            margin-bottom: 2px;
+            color: var(--ink-soft);
+            line-height: 1.6;
         }
 
-        .divider {
-            border: none;
-            border-top: 1px solid #c8ddc5;
-            margin: 24px 0;
+        .pine-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 28px auto 36px;
+            max-width: 320px;
+        }
+        .pine-divider::before, .pine-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--forest-mid));
+        }
+        .pine-divider::after {
+            background: linear-gradient(to left, transparent, var(--forest-mid));
+        }
+        .pine-divider span { color: var(--forest-mid); font-size: 1.1rem; opacity: 0.7; }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(45,90,39,0.06), 0 12px 40px rgba(45,90,39,0.12);
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 40px 44px;
+            width: calc(100% - 48px);
         }
 
-        /* Form */
+        .card-label {
+            font-family: 'Lora', serif;
+            font-size: 0.78rem;
+            font-style: italic;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--moss);
+            margin-bottom: 20px;
+        }
+
         .form-row {
             display: flex;
-            gap: 16px;
+            gap: 14px;
             align-items: flex-end;
             flex-wrap: wrap;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group.main {
-            flex: 1;
-            min-width: 200px;
-        }
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-group.main { flex: 1; min-width: 200px; }
 
         .form-group label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #000000;
+            font-family: 'Lora', serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--ink-soft);
         }
 
-        .form-group input,
-        .form-group select {
-            padding: 10px 14px;
-            border: 1.5px solid #8ab88a;
-            border-radius: 6px;
-            background-color: #ffffff;
-            font-family: "Times New Roman", Times, serif;
-            font-size: 0.95rem;
-            color: #000000;
+        .form-group input, .form-group select {
+            padding: 11px 16px;
+            border: 1.5px solid #d4e4d0;
+            border-radius: 8px;
+            background-color: var(--mist);
+            font-family: 'Lora', serif;
+            font-size: 0.92rem;
+            color: var(--ink);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #3a7035;
-            box-shadow: 0 0 0 3px rgba(58, 112, 53, 0.12);
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--forest-mid);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(58,112,53,0.1);
         }
 
-        .form-group input::placeholder {
-            color: #888;
-        }
+        .form-group input::placeholder { color: #aabda6; font-style: italic; }
 
-        button {
-            padding: 10px 28px;
-            background-color: #3a7035;
-            color: white !important;
+        .generate-btn {
+            padding: 11px 26px;
+            background: linear-gradient(135deg, var(--forest-mid), var(--forest));
+            color: white;
             border: none;
-            border-radius: 6px;
-            font-family: "Times New Roman", Times, serif;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 8px;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(45,90,39,0.25);
         }
 
-        button:hover {
-            background-color: #2d5a27;
+        .generate-btn:hover {
+            background: linear-gradient(135deg, var(--forest), #1e3d1a);
+            box-shadow: 0 4px 14px rgba(45,90,39,0.35);
+            transform: translateY(-1px);
         }
 
-        /* Loading bear walk */
+        #results {
+            display: none;
+            max-width: 780px;
+            margin: 28px auto 0;
+            width: calc(100% - 48px);
+        }
+
+        .results-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .results-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--forest);
+        }
+
+        .results-meta {
+            font-family: 'Lora', serif;
+            font-size: 0.8rem;
+            font-style: italic;
+            color: var(--moss);
+        }
+
+        .brief-box {
+            background: var(--white);
+            border-radius: 16px;
+            border-left: 5px solid var(--forest-mid);
+            padding: 36px 40px;
+            box-shadow: 0 4px 6px rgba(45,90,39,0.06), 0 12px 40px rgba(45,90,39,0.1);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .brief-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--forest);
+            margin: 28px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0eade;
+        }
+
+        .brief-box h2:first-child { margin-top: 0; }
+
+        .brief-box h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--forest-mid);
+            margin: 16px 0 6px;
+        }
+
+        #sources { margin-top: 20px; }
+
+        #sources summary {
+            cursor: pointer;
+            font-family: 'Lora', serif;
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--forest-mid);
+            padding: 10px 0;
+            user-select: none;
+        }
+
+        .source-item { padding: 14px 0; border-bottom: 1px solid #e4ede2; }
+        .source-item:last-child { border-bottom: none; }
+
+        .source-item a {
+            font-family: 'Lora', serif;
+            font-weight: 500;
+            color: var(--forest-mid);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .source-item a:hover { color: var(--forest); text-decoration: underline; }
+        .source-meta { font-size: 0.78rem; font-style: italic; color: var(--moss); margin-top: 3px; }
+        .source-desc { font-size: 0.85rem; color: var(--ink-soft); margin-top: 5px; line-height: 1.5; }
+
+        #error {
+            display: none;
+            background: #fff5f5;
+            border-left: 4px solid #c0392b;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 16px auto 0;
+            font-size: 0.9rem;
+            color: #922b21;
+            max-width: 780px;
+            width: calc(100% - 48px);
+        }
+
         #loading {
             display: none;
             position: fixed;
-            bottom: 0;
+            bottom: 60px;
             left: 0;
             width: 100%;
-            height: 100px;
+            height: 80px;
             pointer-events: none;
             z-index: 9998;
         }
 
         #loading-text {
+            display: none;
             position: fixed;
-            bottom: 30px;
+            bottom: 34px;
             width: 100%;
             text-align: center;
-            font-size: 15px;
-            color: #2d5a27;
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--forest);
+            z-index: 9998;
         }
 
         @keyframes walkAcross {
@@ -175,7 +337,7 @@
         }
         @keyframes walkBounce {
             0%, 100% { transform: translateY(0px); }
-            50%       { transform: translateY(-8px); }
+            50%       { transform: translateY(-10px); }
         }
 
         #walking-bear {
@@ -184,151 +346,108 @@
             animation: walkAcross 5s linear infinite, walkBounce 1s ease-in-out infinite;
         }
 
-        /* Results */
-        #results {
-            display: none;
-            margin-top: 32px;
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            font-family: 'Lora', serif;
+            font-size: 0.75rem;
+            font-style: italic;
+            color: var(--forest);
+            opacity: 0.65;
+            z-index: 10;
+            background: linear-gradient(to top, rgba(178,201,173,0.9), transparent);
         }
 
-        #results h2 {
-            font-size: 1.5rem;
-            color: #2d5a27;
-            margin-bottom: 4px;
-        }
-
-        #results .meta {
-            font-size: 0.85rem;
-            color: #4a6e46;
-            margin-bottom: 16px;
-        }
-
-        .brief-box {
-            background-color: #ffffff;
-            border-left: 4px solid #3a7035;
-            padding: 28px 32px;
-            border-radius: 8px;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-
-        .brief-box h2, .brief-box h3 {
-            color: #2d5a27;
-            margin: 20px 0 8px 0;
-        }
-
-        /* Sources */
-        #sources {
-            margin-top: 24px;
-        }
-
-        #sources summary {
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #2d5a27;
-            padding: 10px 0;
-        }
-
-        .source-item {
-            padding: 14px 0;
-            border-bottom: 1px solid #c8ddc5;
-        }
-
-        .source-item a {
-            font-weight: 600;
-            color: #2d5a27;
-            text-decoration: none;
-        }
-
-        .source-item a:hover {
-            text-decoration: underline;
-        }
-
-        .source-item .source-meta {
-            font-size: 0.82rem;
-            color: #4a6e46;
-            margin-top: 3px;
-        }
-
-        .source-item p {
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        /* Error */
-        #error {
-            display: none;
-            background-color: #fff0f0;
-            border-left: 4px solid #c0392b;
-            padding: 14px 18px;
-            border-radius: 6px;
-            margin-top: 20px;
-            color: #c0392b !important;
+        @media (max-width: 600px) {
+            .card { padding: 28px 24px; }
+            .brief-box { padding: 24px 22px; }
+            .form-row { flex-direction: column; }
+            .generate-btn { width: 100%; }
+            .hero { padding: 48px 20px 32px; }
         }
     </style>
 </head>
 <body>
 
+    <svg class="mountain-bg" viewBox="0 0 1440 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,220 L0,160 L80,120 L140,150 L220,80 L300,110 L380,50 L440,90 L520,30 L600,70 L660,10 L720,50 L800,20 L860,55 L940,25 L1000,60 L1080,40 L1140,70 L1220,35 L1300,65 L1380,45 L1440,60 L1440,220 Z" fill="#2d5a27"/>
+        <g fill="#2d5a27" opacity="0.6">
+            <polygon points="60,160 75,120 90,160"/>
+            <polygon points="70,160 85,130 100,160"/>
+            <polygon points="160,155 175,115 190,155"/>
+            <polygon points="170,155 185,125 200,155"/>
+            <polygon points="1340,155 1355,115 1370,155"/>
+            <polygon points="1350,155 1365,125 1380,155"/>
+        </g>
+    </svg>
+
     <div id="bear-widget">🐻</div>
 
-    <div class="container">
-        <div class="header">
-            <h1>AI Market Research Tool</h1>
-            <p>Powered by Claude + NewsAPI — enter any company, industry, or topic.</p>
-            <p>Built by Boston Borg</p>
+    <div class="page-wrapper">
+
+        <div class="hero">
+            <h1>AI Market<br><span>Research Tool</span></h1>
+            <p class="hero-sub">
+                Powered by Claude + NewsAPI &mdash; enter any company, industry, or topic.<br>
+                Built by Boston Borg
+            </p>
+            <div class="pine-divider"><span>🏔</span></div>
         </div>
 
-        <hr class="divider">
-
-        <div class="form-row">
-            <div class="form-group main">
-                <label for="query">What do you want to research?</label>
-                <input type="text" id="query" placeholder="e.g. Salesforce, AI startups, electric vehicles">
+        <div class="card">
+            <p class="card-label">Start your research</p>
+            <div class="form-row">
+                <div class="form-group main">
+                    <label for="query">What do you want to research?</label>
+                    <input type="text" id="query" placeholder="e.g. Salesforce, AI startups, electric vehicles">
+                </div>
+                <div class="form-group">
+                    <label for="days">How recent?</label>
+                    <select id="days">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="30">Last 30 days</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="count">Articles</label>
+                    <select id="count">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <button class="generate-btn" onclick="runResearch()">Generate Brief</button>
             </div>
-            <div class="form-group">
-                <label for="days">How recent?</label>
-                <select id="days">
-                    <option value="7">Last 7 days</option>
-                    <option value="14">Last 14 days</option>
-                    <option value="30">Last 30 days</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="count">Articles to pull</label>
-                <select id="count">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                </select>
-            </div>
-            <button onclick="runResearch()">Generate Research Brief</button>
         </div>
-
-        <hr class="divider">
 
         <div id="error"></div>
 
         <div id="results">
-            <h2 id="results-title"></h2>
-            <p class="meta" id="results-meta"></p>
+            <div class="results-header">
+                <h2 id="results-title"></h2>
+                <span class="results-meta" id="results-meta"></span>
+            </div>
             <div class="brief-box" id="brief-content"></div>
             <details id="sources">
                 <summary>View source articles</summary>
                 <div id="source-list"></div>
             </details>
         </div>
+
     </div>
 
-    <!-- Loading bear -->
-    <div id="loading">
-        <div id="walking-bear">🐻</div>
-    </div>
-    <div id="loading-text" style="display:none;">Analyzing the wilderness of the internet...</div>
+    <div id="loading"><div id="walking-bear">🐻</div></div>
+    <div id="loading-text">Scouting the wilderness of the internet...</div>
+
+    <div class="footer">Boston Borg &nbsp;&middot;&nbsp; Seattle Pacific University</div>
 
     <script>
-        // Top right bear animations
         const states = [
             { emoji: "🐻", anim: "" },
             { emoji: "🐟", anim: "bear-wobble", swap: "🐻" },
@@ -346,31 +465,17 @@
             const s = states[current];
             bearEl.className = "";
             bearEl.textContent = s.emoji;
-            if (s.anim) {
-                void bearEl.offsetWidth;
-                bearEl.classList.add(s.anim);
-            }
-            if (s.swap) {
-                setTimeout(() => {
-                    bearEl.textContent = s.swap;
-                    bearEl.className = "bear-wobble";
-                }, 1500);
-            }
+            if (s.anim) { void bearEl.offsetWidth; bearEl.classList.add(s.anim); }
+            if (s.swap) { setTimeout(() => { bearEl.textContent = s.swap; bearEl.className = "bear-wobble"; }, 1500); }
         }
         setInterval(nextState, 3500);
 
-        // Research function
         async function runResearch() {
             const query = document.getElementById("query").value.trim();
             const days = document.getElementById("days").value;
             const count = document.getElementById("count").value;
+            if (!query) { alert("Please enter a search term."); return; }
 
-            if (!query) {
-                alert("Please enter a search term.");
-                return;
-            }
-
-            // Show loading
             document.getElementById("loading").style.display = "block";
             document.getElementById("loading-text").style.display = "block";
             document.getElementById("results").style.display = "none";
@@ -382,9 +487,7 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ query, days, count })
                 });
-
                 const data = await response.json();
-
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("loading-text").style.display = "none";
 
@@ -395,24 +498,23 @@
                     return;
                 }
 
-                // Render results
                 document.getElementById("results-title").textContent = `Research Brief: ${query}`;
-                document.getElementById("results-meta").textContent = `Based on ${data.article_count} articles from the last ${days} days`;
+                document.getElementById("results-meta").textContent = `Based on ${data.article_count} articles · Last ${days} days`;
                 document.getElementById("brief-content").innerHTML = formatMarkdown(data.analysis);
 
-                // Sources
                 const sourceList = document.getElementById("source-list");
                 sourceList.innerHTML = "";
                 data.articles.forEach((a, i) => {
                     sourceList.innerHTML += `
                         <div class="source-item">
                             <a href="${a.url}" target="_blank">${i+1}. ${a.title}</a>
-                            <div class="source-meta">${a.source} · ${a.date}</div>
-                            <p>${a.description || ""}</p>
+                            <div class="source-meta">${a.source} &middot; ${a.date}</div>
+                            <p class="source-desc">${a.description || ""}</p>
                         </div>`;
                 });
 
                 document.getElementById("results").style.display = "block";
+                document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
 
             } catch (err) {
                 document.getElementById("loading").style.display = "none";
@@ -423,17 +525,16 @@
             }
         }
 
-        // Basic markdown to HTML
         function formatMarkdown(text) {
             return text
-                .replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
-                .replace(/### (.*?)(\n|$)/g, '<h3>$1</h3>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p>')
                 .replace(/\n/g, '<br>');
         }
 
-        // Allow Enter key to submit
         document.getElementById("query").addEventListener("keydown", function(e) {
             if (e.key === "Enter") runResearch();
         });
