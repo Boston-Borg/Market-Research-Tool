@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Market Research Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Times New Roman", Times, serif;
+            color: #000000;
+        }
+
+        body {
+            background-color: #b2c9ad;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* Bear */
+        #bear-widget {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            font-size: 44px;
+            z-index: 9999;
+            cursor: default;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .bear-wobble { animation: wobble 0.4s ease-in-out infinite; }
+        .bear-bounce { animation: bounce 0.5s ease-in-out infinite; }
+        .bear-spin   { animation: spin 0.8s linear infinite; }
+        .bear-shake  { animation: shake 0.3s ease-in-out infinite; }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #2d5a27;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #c8ddc5;
+            margin: 24px 0;
+        }
+
+        /* Form */
+        .form-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.main {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1.5px solid #8ab88a;
+            border-radius: 6px;
+            background-color: #ffffff;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 0.95rem;
+            color: #000000;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #3a7035;
+            box-shadow: 0 0 0 3px rgba(58, 112, 53, 0.12);
+        }
+
+        .form-group input::placeholder {
+            color: #888;
+        }
+
+        button {
+            padding: 10px 28px;
+            background-color: #3a7035;
+            color: white !important;
+            border: none;
+            border-radius: 6px;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #2d5a27;
+        }
+
+        /* Loading bear walk */
+        #loading {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        #loading-text {
+            position: fixed;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            font-size: 15px;
+            color: #2d5a27;
+        }
+
+        @keyframes walkAcross {
+            0%   { left: -10%; }
+            100% { left: 110%; }
+        }
+        @keyframes walkBounce {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+
+        #walking-bear {
+            position: absolute;
+            font-size: 52px;
+            animation: walkAcross 5s linear infinite, walkBounce 1s ease-in-out infinite;
+        }
+
+        /* Results */
+        #results {
+            display: none;
+            margin-top: 32px;
+        }
+
+        #results h2 {
+            font-size: 1.5rem;
+            color: #2d5a27;
+            margin-bottom: 4px;
+        }
+
+        #results .meta {
+            font-size: 0.85rem;
+            color: #4a6e46;
+            margin-bottom: 16px;
+        }
+
+        .brief-box {
+            background-color: #ffffff;
+            border-left: 4px solid #3a7035;
+            padding: 28px 32px;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .brief-box h2, .brief-box h3 {
+            color: #2d5a27;
+            margin: 20px 0 8px 0;
+        }
+
+        /* Sources */
+        #sources {
+            margin-top: 24px;
+        }
+
+        #sources summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #2d5a27;
+            padding: 10px 0;
+        }
+
+        .source-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #c8ddc5;
+        }
+
+        .source-item a {
+            font-weight: 600;
+            color: #2d5a27;
+            text-decoration: none;
+        }
+
+        .source-item a:hover {
+            text-decoration: underline;
+        }
+
+        .source-item .source-meta {
+            font-size: 0.82rem;
+            color: #4a6e46;
+            margin-top: 3px;
+        }
+
+        .source-item p {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Error */
+        #error {
+            display: none;
+            background-color: #fff0f0;
+            border-left: 4px solid #c0392b;
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin-top: 20px;
+            color: #c0392b !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bear-widget">🐻</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>AI Market Research Tool</h1>
+            <p>Powered by Claude + NewsAPI — enter any company, industry, or topic.</p>
+            <p>Built by Boston Borg</p>
+        </div>
+
+        <hr class="divider">
+
+        <div class="form-row">
+            <div class="form-group main">
+                <label for="query">What do you want to research?</label>
+                <input type="text" id="query" placeholder="e.g. Salesforce, AI startups, electric vehicles">
+            </div>
+            <div class="form-group">
+                <label for="days">How recent?</label>
+                <select id="days">
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30">Last 30 days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="count">Articles to pull</label>
+                <select id="count">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+            <button onclick="runResearch()">Generate Research Brief</button>
+        </div>
+
+        <hr class="divider">
+
+        <div id="error"></div>
+
+        <div id="results">
+            <h2 id="results-title"></h2>
+            <p class="meta" id="results-meta"></p>
+            <div class="brief-box" id="brief-content"></div>
+            <details id="sources">
+                <summary>View source articles</summary>
+                <div id="source-list"></div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Loading bear -->
+    <div id="loading">
+        <div id="walking-bear">🐻</div>
+    </div>
+    <div id="loading-text" style="display:none;">Analyzing the wilderness of the internet...</div>
+
+    <script>
+        // Top right bear animations
+        const states = [
+            { emoji: "🐻", anim: "" },
+            { emoji: "🐟", anim: "bear-wobble", swap: "🐻" },
+            { emoji: "🐻", anim: "bear-wobble" },
+            { emoji: "🐻", anim: "bear-bounce" },
+            { emoji: "🐻", anim: "" },
+            { emoji: "🐻", anim: "bear-shake" },
+            { emoji: "🐻", anim: "bear-spin" },
+            { emoji: "🐻", anim: "" },
+        ];
+        let current = 0;
+        const bearEl = document.getElementById("bear-widget");
+        function nextState() {
+            current = (current + 1) % states.length;
+            const s = states[current];
+            bearEl.className = "";
+            bearEl.textContent = s.emoji;
+            if (s.anim) {
+                void bearEl.offsetWidth;
+                bearEl.classList.add(s.anim);
+            }
+            if (s.swap) {
+                setTimeout(() => {
+                    bearEl.textContent = s.swap;
+                    bearEl.className = "bear-wobble";
+                }, 1500);
+            }
+        }
+        setInterval(nextState, 3500);
+
+        // Research function
+        async function runResearch() {
+            const query = document.getElementById("query").value.trim();
+            const days = document.getElementById("days").value;
+            const count = document.getElementById("count").value;
+
+            if (!query) {
+                alert("Please enter a search term.");
+                return;
+            }
+
+            // Show loading
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("loading-text").style.display = "block";
+            document.getElementById("results").style.display = "none";
+            document.getElementById("error").style.display = "none";
+
+            try {
+                const response = await fetch("/research", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query, days, count })
+                });
+
+                const data = await response.json();
+
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("loading-text").style.display = "none";
+
+                if (data.error) {
+                    const err = document.getElementById("error");
+                    err.textContent = data.error;
+                    err.style.display = "block";
+                    return;
+                }
+
+                // Render results
+                document.getElementById("results-title").textContent = `Research Brief: ${query}`;
+                document.getElementById("results-meta").textContent = `Based on ${data.article_count} articles from the last ${days} days`;
+                document.getElementById("brief-content").innerHTML = formatMarkdown(data.analysis);
+
+                // Sources
+                const sourceList = document.getElementById("source-list");
+                sourceList.innerHTML = "";
+                data.articles.forEach((a, i) => {
+                    sourceList.innerHTML += `
+                        <div class="source-item">
+                            <a href="${a.url}" target="_blank">${i+1}. ${a.title}</a>
+                            <div class="source-meta">${a.source} · ${a.date}</div>
+                            <p>${a.description || ""}</p>
+                        </div>`;
+                });
+
+                document.getElementById("results").style.display = "block";
+
+            } catch (err) {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("loading-text").style.display = "none";
+                const errEl = document.getElementById("error");
+                errEl.textContent = "Something went wrong. Make sure the server is running.";
+                errEl.style.display = "block";
+            }
+        }
+
+        // Basic markdown to HTML
+        function formatMarkdown(text) {
+            return text
+                .replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
+                .replace(/### (.*?)(\n|$)/g, '<h3>$1</h3>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Allow Enter key to submit
+        document.getElementById("query").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") runResearch();
+        });
+    </script>
+</body>
+</html>
